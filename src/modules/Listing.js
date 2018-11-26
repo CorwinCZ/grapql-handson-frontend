@@ -41,11 +41,7 @@ class Listing extends Component {
           }
 
           const peopleList = data.allPeople.people;
-
           const lastElementCursor = data.allPeople.edges.pop()['cursor'];
-          console.log('Cursor to last element', lastElementCursor);
-
-          console.log('Inside data', data);
 
           const loadMoreData = () => {
             fetchMore({
