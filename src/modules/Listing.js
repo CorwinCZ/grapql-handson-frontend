@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
+import gql from 'graphql-tag';
 
 import ListingItem from './ListingItem';
+
+import apolloClient from '../apolloClient';
 
 const dummyData = [
   {
@@ -44,6 +47,24 @@ class Listing extends Component {
       data: dummyData,
     };
   }
+
+  componentDidMount = () => {
+    console.log('Mounted');
+    apolloClient
+      .query({
+        query: gql`
+          query testQuery {
+            allPeople(first: 8) {
+              people {
+                id
+                name
+              }
+            }
+          }
+        `,
+      })
+      .then(result => console.log('result', result));
+  };
 
   renderDataList = () => {
     const { data } = this.state;
