@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
+import gql from 'graphql-tag';
 
 import ListingItem from './ListingItem';
 
-import { API_URL } from '../config';
+import apolloClient from '../apolloClient';
 
 class Listing extends Component {
   constructor(props) {
@@ -13,6 +14,29 @@ class Listing extends Component {
   }
 
   componentDidMount = async () => {
+    console.log('Mounted');
+
+    const query = gql`
+      query testQuery($itemsCount: Int!) {
+        allPeople(first: $itemsCount) {
+          people {
+            id
+            name
+            mass
+          }
+        }
+      }
+    `;
+
+    const queryVariables = { itemsCount: 4 };
+
+    const resData = await apolloClient.query({
+      query: query,
+      variables: queryVariables,
+    });
+  };
+
+  /*componentDidMount = async () => {
     const query = `query testQuery($itemsCount: Int!) {
   allPeople(first: $itemsCount) {
     people {
@@ -33,7 +57,7 @@ class Listing extends Component {
     ).then(response => response.json());
 
     this.setState({ data: responseData.data.allPeople.people });
-  };
+  };*/
 
   renderDataList = () => {
     const { data } = this.state;
