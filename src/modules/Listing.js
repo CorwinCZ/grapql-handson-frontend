@@ -2,48 +2,38 @@ import React, { Component } from 'react';
 
 import ListingItem from './ListingItem';
 
-const dummyData = [
-  {
-    id: 'cGVvcGxlOjE=',
-    name: 'Luke Skywalker',
-  },
-  {
-    id: 'cGVvcGxlOjI=',
-    name: 'C-3PO',
-  },
-  {
-    id: 'cGVvcGxlOjM=',
-    name: 'R2-D2',
-  },
-  {
-    id: 'cGVvcGxlOjQ=',
-    name: 'Darth Vader',
-  },
-  {
-    id: 'cGVvcGxlOjU=',
-    name: 'Leia Organa',
-  },
-  {
-    id: 'cGVvcGxlOjY=',
-    name: 'Owen Lars',
-  },
-  {
-    id: 'cGVvcGxlOjc=',
-    name: 'Beru Whitesun lars',
-  },
-  {
-    id: 'cGVvcGxlOjg=',
-    name: 'R5-D4',
-  },
-];
+import { API_URL } from '../config';
 
 class Listing extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: dummyData,
+      data: [{}, {}],
     };
   }
+
+  componentDidMount = async () => {
+    const query = `query testQuery($itemsCount: Int!) {
+  allPeople(first: $itemsCount) {
+    people {
+      id
+      name
+      mass
+    }
+  }
+}`;
+    const queryVariables = { itemsCount: 4 };
+
+    const responseData = await fetch(
+      `${API_URL}?query=${encodeURIComponent(
+        query,
+      )}&operationName=testQuery&variables=${encodeURIComponent(
+        JSON.stringify(queryVariables),
+      )}`,
+    ).then(response => response.json());
+
+    this.setState({ data: responseData.data.allPeople.people });
+  };
 
   renderDataList = () => {
     const { data } = this.state;
