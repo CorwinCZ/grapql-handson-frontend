@@ -1,16 +1,19 @@
 import React, { Component } from 'react';
 import gql from 'graphql-tag';
 import { Query } from 'react-apollo';
+import { Button } from 'reactstrap';
 
 import ListingItem from './ListingItem';
 
 const query = gql`
-  query testQuery($itemsCount: Int!) {
-    allPeople(first: $itemsCount) {
+  query testQuery($itemsCount: Int!, $after: String!) {
+    allPeople(first: $itemsCount, after: $after) {
       people {
         id
         name
-        mass
+      }
+      edges {
+        cursor
       }
     }
   }
@@ -25,11 +28,11 @@ class Listing extends Component {
   };
 
   render() {
-    const queryVariables = { itemsCount: 3 };
+    const queryVariables = { itemsCount: 4, after: '' };
 
     return (
       <Query query={query} variables={queryVariables}>
-        {({ data, loading, error }) => {
+        {({ data, loading, error, fetchMore }) => {
           if (error) {
             return <div>Error!</div>;
           }
@@ -37,8 +40,47 @@ class Listing extends Component {
             return <div>Loading...</div>;
           }
 
+          const peopleList = data.allPeople.people;
+
+          const lastElementCursor = data.allPeople.edges.pop()['cursor'];
+          console.log('Cursor to last element', lastElementCursor);
+
           console.log('Inside data', data);
-          return this.renderDataList(data.allPeople.people);
+
+          const loadMoreData = () => {
+            fetchMore({
+              variables: {
+                after: lastElementCursor,
+              },
+              updateQuery: (prev, { fetchMoreResult }) => {
+                if (!fetchMoreResult) return prev;
+
+                return {
+                  ...prev,
+                  allPeople: {
+                    ...prev.allPeople,
+                    edges: [
+                      ...prev.allPeople.edges,
+                      ...fetchMoreResult.allPeople.edges,
+                    ],
+                    people: [
+                      ...prev.allPeople.people,
+                      ...fetchMoreResult.allPeople.people,
+                    ],
+                  },
+                };
+              },
+            });
+          };
+
+          return (
+            <div>
+              <Button color="success" onClick={loadMoreData}>
+                Load more
+              </Button>
+              {this.renderDataList(peopleList)}
+            </div>
+          );
         }}
       </Query>
     );
