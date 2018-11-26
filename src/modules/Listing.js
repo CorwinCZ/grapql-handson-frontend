@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Button } from 'reactstrap';
 
 import ListingItem from './ListingItem';
 
@@ -49,8 +48,8 @@ class Listing extends Component {
   renderDataList = () => {
     const { data } = this.state;
     const { switchToDetail } = this.props;
-    return data.map(item => (
-      <ListingItem data={item} switchToDetail={switchToDetail} />
+    return data.map((item, index) => (
+      <ListingItem key={index} data={item} switchToDetail={switchToDetail} />
     ));
   };
 
