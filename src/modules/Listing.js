@@ -45,6 +45,24 @@ class Listing extends Component {
     };
   }
 
+  componentDidMount = async () => {
+    console.log('Mounted');
+    const queryString = `{
+  allPeople(first: 8) {
+    people {
+      id
+      name
+    }
+  }
+}`;
+
+    const result = await fetch(
+      `http://corwincz.cz:1111/?query=${encodeURIComponent(queryString)}`,
+    ).then(response => response.json());
+
+    console.log('Returned', result);
+  };
+
   renderDataList = () => {
     const { data } = this.state;
     const { switchToDetail } = this.props;
